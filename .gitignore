@@ -1,23 +1,42 @@
-# Object files
+*~
 *.o
-*.ko
-*.obj
-*.elf
+.deps
+.libs
+.version
+.*.swp
+*.gdb
+.gdbinit
+.gdb_history
 
-# Libraries
-*.lib
-*.a
+/ChangeLog
+/CREDITS
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+Makefile
+Makefile.in
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+/aclocal.m4
+/autom4te.cache
+/config.guess
+/config.h
+/config.h.in
+/config.log
+/config.status
+/config.sub
+/configure
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+
+/*.gdb
+/ioctls.h
+/ioctldefs.h
+/ioctlsort
+/strace
+/test-driver
+
+/linux/ioctlent.h
+
+/strace-*.tar.xz
+
+/nbproject/
