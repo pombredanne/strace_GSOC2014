@@ -8,7 +8,7 @@ Currently, I am still working on my prototpe to make it better. The code is chan
 Please Note that the prototype is only a simple prototype. The implementation is not optimal and some code may be ugly.
 
 ###HowTo
-It's easy to use my modified strace, just like you compling any other linux source code.
+It's easy to use my modified strace, just like you compling any other linux source code.  
 1. git clone https://github.com/zym0017d/strace_GSOC2014.git  
 2. cd strace_GSOC2014 && make clean && ./configure && make  
 3. cd strace_GSOC2014/test && make
