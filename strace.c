@@ -78,6 +78,8 @@ bool need_fork_exec_workarounds = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
 bool iflag = 0;
+int  jflag = 0;
+output_format_t jformat = FORMAT_ORIG;
 unsigned int qflag = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
@@ -204,6 +206,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
 -i -- print instruction pointer at time of syscall\n\
+-j -- use json as the output format \n\
 -q -- suppress messages about attaching, detaching, etc.\n\
 -r -- print relative timestamp, -t -- absolute timestamp, -tt -- with usecs\n\
 -T -- print time spent in each syscall\n\
@@ -1650,7 +1653,7 @@ init(int argc, char *argv[])
 #endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+b:cCdfFhiqrtTvVxyz"
+		"+b:cCdfFhijqrtTvVxyz"
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
@@ -1689,6 +1692,10 @@ init(int argc, char *argv[])
 			break;
 		case 'i':
 			iflag = 1;
+			break;
+		case 'j':
+			jflag = 1;
+			jformat = FORMAT_JSON;
 			break;
 		case 'q':
 			qflag++;

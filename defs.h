@@ -548,6 +548,7 @@ extern cflag_t cflag;
 extern bool debug_flag;
 extern bool Tflag;
 extern bool iflag;
+extern int  jflag;
 extern unsigned int qflag;
 extern bool not_failing_only;
 extern bool show_fd_path;
@@ -804,3 +805,40 @@ extern unsigned num_quals;
 /* Only ensures that sysent[scno] isn't out of range */
 #define SCNO_IN_RANGE(scno) \
 	((unsigned long)(scno) < nsyscalls)
+
+
+
+
+/* 
+ * Support JSON output 
+ */
+typedef enum  { 
+	FORMAT_ORIG, 
+	FORMAT_JSON 
+} output_format_t ;
+
+/*
+ * output state
+ * the comment described what the ORIG format (unmodified strace) will be.
+ */
+typedef enum  {
+	EVENT_NONE = 0,
+	EVENT_CALL_BEGIN, /* 'syscall_name(' */
+	EVENT_CALL_ARG,  /* arguments one by one, extra indicate sequence(1, 2, ...) */
+	EVENT_CALL_END, /* ') ' and then call tabto()  */
+	EVENT_CALL_RET_ERRNO,
+	EVENT_CALL_RET_CODE, /* '= retcode', extra store the errno */
+	EVENT_CALL_RET_DESC,
+	EVENT_ALL_BEGIN, 
+	EVENT_ALL_END,
+	EVENT_ENTRY_BEGIN, /* ignore this states. */
+	EVENT_ENTRY_END, /* tprints('\n') */
+	EVENT_TIME_SPENT, /* tprintf(" <%ld.%06ld>",tv.tv_sec, tv.tv_usec ) */
+	EVENT_TIME_RELATIVE,
+	EVENT_INSTRUCTION_POINTER,
+	EVENT_COUNT, /* must be the last one entry in this table */
+} output_event_t ;
+
+extern output_format_t jformat;
+extern int output_trace(output_event_t event, const char *str, long extra);
+#define STRBUF_SIZE (5000)
