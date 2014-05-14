@@ -48,59 +48,59 @@ int output_json(output_event_t event, const char *str, long extra)
 {
 	switch ( event ) {
 		case EVENT_NONE:
-		  break;
+			break;
 
 		case EVENT_CALL_BEGIN:
-		  tprintf("\"Type\" : \"syscall\",\n");
-		  tprintf("\"Name\" : \"%s\",\n", str);
-		  tprintf("\"Args\" : [ ");
-		  break;
+			tprintf("\"Type\" : \"syscall\",\n");
+			tprintf("\"Name\" : \"%s\",\n", str);
+			tprintf("\"Args\" : [ ");
+			break;
 
 		case EVENT_CALL_ARG:
-		  tprintf("\"%s\", ",  str);
-		  break;
+			tprintf("\"%s\", ",  str);
+			break;
 
 		case EVENT_CALL_END:
-		  tprints( " ],\n" );
-		  break;
+			tprints( " ],\n" );
+			break;
 
 		case EVENT_CALL_RET_ERRNO:
-		  tprintf("\"Errno\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"Errno\" : \"%s\",\n", str);
+			break;
 
 		case EVENT_CALL_RET_CODE:
-		  tprintf("\"Return\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"Return\" : \"%s\",\n", str);
+			break;
 
 		case EVENT_CALL_RET_DESC:
-		  tprintf("\"Describe\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"Describe\" : \"%s\",\n", str);
+			break;
 
 		case EVENT_ALL_BEGIN:
 		case EVENT_ALL_END:
-		  break;
+			break;
 
 	   case EVENT_ENTRY_BEGIN:
-		  tprints("{\n");
-		  break;
+			tprints("{\n");
+			break;
 		case EVENT_ENTRY_END:
-		  tprints("}\n");
-		  break;
+			tprints("}\n");
+			break;
 
 		case EVENT_TIME_SPENT:
-		  tprintf("\"TimeSpent\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"TimeSpent\" : \"%s\",\n", str);
+			break;
 
 		case EVENT_TIME_RELATIVE:
-		  tprintf("\"TimeRelative\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"TimeRelative\" : \"%s\",\n", str);
+			break;
 
 		case EVENT_INSTRUCTION_POINTER:
-		  tprintf("\"Pointer\" : \"%s\",\n", str);
-		  break;
+			tprintf("\"Pointer\" : \"%s\",\n", str);
+			break;
 
 		default:
-		  break;
+			break;
 	}
 	return 0;
 }
