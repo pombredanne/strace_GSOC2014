@@ -34,12 +34,39 @@
 # include <sys/uio.h>
 #endif
 
+#include <stdio.h>
+
 int
 sys_read(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		if (jformat == FORMAT_ORIG) {
+			printfd(tcp, tcp->u_arg[0]);
+			tprints(", ");
+		} else {
+			char* ftemp = NULL;
+			size_t fsize = 0;
+			FILE* mock_file = open_memstream(&ftemp, &fsize);
+			if (mock_file == NULL) {
+				tprints("json unhandeable error fatal\n");
+				return 0;
+			}
+			
+			FILE* oldfile = tcp->outf;
+			int oldcol = tcp->curcol;
+			
+			tcp->outf = mock_file;
+			
+			printfd(tcp, tcp->u_arg[0]);
+			tprints(", ");
+			
+			fclose(mock_file);
+			tcp->outf = oldfile;
+			tcp->curcol = oldcol;
+			tprintf("json output is %s", ftemp);
+			
+			free(ftemp);
+		}
 	} else {
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);

@@ -26,18 +26,22 @@ int main(int argc, char *argv[])
 
     char buf[BUFSIZE];
     int n;
+	int ret = 0;
     while (n = read(fd_from, buf, BUFSIZE)) {
-        if (n == -1) {
+        if (n < 0) {
             fprintf(stderr, "failed read from %s\n", READFILE);
-            return -1;
-        }
+            ret = -1;
+			break;
+		}
         n = write(fd_to, buf, n);
-        if ( n == -1 ) {
+        if ( n < 0 ) {
             fprintf(stderr, "failed to write to %s\n", WRITEFILE);
-            return -1;
+            ret = -1;
+			break;
         }
     }
-    
-    printf("exited\n");
-    return 0;
+   
+   	close(fd_from);
+	close(fd_to);
+    return ret;
 }
