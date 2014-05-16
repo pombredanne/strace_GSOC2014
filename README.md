@@ -9,11 +9,10 @@ Please Note that the prototype is only a simple prototype. The implementation is
 
 ###HowTo(Not Avaliable yet, coming soon)
 It's easy to use my modified strace, just like you compling any other linux source code.  
-1. git clone https://github.com/zym0017d/strace_GSOC2014.git
+1. git clone https://github.com/zym0017d/strace_GSOC2014.git  
 2. cd strace_GSOC2014 && git checkout devel  
-3. make clean && ./configure && make
-4. cd strace_GSOC2014/test && make
-  
+3. make clean && ./configure && make  
+4. cd strace_GSOC2014/test && make  
 
 After this, You should have the newly compiled strace in the top directory.  
 Note: You'd better not run make install  
