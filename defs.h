@@ -683,6 +683,7 @@ extern void printsiginfo(siginfo_t *, int);
 extern void printsiginfo_at(struct tcb *tcp, long addr);
 #endif
 extern void printfd(struct tcb *, int);
+extern void sprintfd(char *str, struct tcb *, int);
 extern void print_dirfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
@@ -840,5 +841,11 @@ typedef enum  {
 } output_event_t ;
 
 extern output_format_t jformat;
-extern int output_trace(output_event_t event, const char *str, long extra);
+extern int redirect_output_flag;
+extern FILE *mock_file;
+
+void output_begin_meta();
+void output_enable_redirect();
+void output_disable_redirect();
+extern int output_event(output_event_t event, long extra);
 #define STRBUF_SIZE (5000)

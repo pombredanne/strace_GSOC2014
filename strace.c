@@ -533,7 +533,12 @@ tprintf(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	if (current_tcp) {
+	
+	if (redirect_output_flag) {
+		strace_vfprintf(mock_file, fmt, args);
+		return;
+	}
+	else if (current_tcp) {
 		int n = strace_vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			if (current_tcp->outf != stderr)
@@ -544,6 +549,7 @@ tprintf(const char *fmt, ...)
 	va_end(args);
 }
 
+
 #ifndef HAVE_FPUTS_UNLOCKED
 # define fputs_unlocked fputs
 #endif
@@ -551,6 +557,12 @@ tprintf(const char *fmt, ...)
 void
 tprints(const char *str)
 {
+	if (redirect_output_flag) {
+		fprintf(mock_file, "%s", str);
+		// currently do not support perror_msg
+		return;
+	}
+	
 	if (current_tcp) {
 		int n = fputs_unlocked(str, current_tcp->outf);
 		if (n >= 0) {

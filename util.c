@@ -416,6 +416,17 @@ printfd(struct tcb *tcp, int fd)
 }
 
 void
+sprintfd(char *str, struct tcb *tcp, int fd)
+{
+	char path[PATH_MAX + 1];
+
+	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0)
+		sprintf(str, "%d<%s>", fd, path);
+	else
+		sprintf(str, "%d", fd);
+}
+
+void
 printuid(const char *text, unsigned long uid)
 {
 	tprintf((uid == -1) ? "%s%ld" : "%s%lu", text, uid);

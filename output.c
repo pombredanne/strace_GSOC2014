@@ -98,70 +98,60 @@ int output_json(output_event_t event, const char *str, long extra)
 		case EVENT_INSTRUCTION_POINTER:
 			tprintf("\"Pointer\" : \"%s\",\n", str);
 			break;
-
+			
 		default:
 			break;
 	}
 	return 0;
 }
 
-int output_orig(output_event_t event, const char *str, long extra)
+int redirect_output_flag = 0;
+FILE *mock_file = NULL;
+static char *mock_buf  = NULL;
+static size_t mock_size = 0;
+
+void output_enable_redirect()
 {
-	switch ( event ) {
-		case EVENT_NONE:
-		  break;
-
-		case EVENT_CALL_ARG:
-		  tprintf(extra == 1 ? "%s" : ", %s", str);
-		  break;
-
-		case EVENT_CALL_END:
-		  tprints(") ");
-		  tabto();
-		  break;
-
-		case EVENT_CALL_RET_CODE:
-		  tprintf("= %s ", str);
-		  break;
-
-		case EVENT_CALL_RET_ERRNO:
-		  tprintf("(errno %s) ", str);
-		  break;
-
-		case EVENT_CALL_RET_DESC:
-		  tprintf("%s ", str);
-		  break;
-
-		case EVENT_ALL_BEGIN:
-		case EVENT_ALL_END:
-		  break;
-
-		case EVENT_ENTRY_END:
-		  tprints("\n");
-		  break;
-
-		case EVENT_CALL_BEGIN:
-		  tprintf("%s(", str);
-		  break;
-
-		case EVENT_TIME_SPENT:
-		  tprintf(" <%s>", str);
-		  break;
-
-		case EVENT_TIME_RELATIVE:
-		  tprintf("%s ", str);
-		  break;
-
-		case EVENT_INSTRUCTION_POINTER:
-		  tprintf("[%s] ", str);
-		  break;
-
-		default:
-		  break;
+	if (jformat == FORMAT_ORIG)
+		return;
+	
+	redirect_output_flag = 1;
+	if (mock_file == NULL) {
+			mock_file = open_memstream(&mock_buf, &mock_size);
+			if (mock_file == NULL) {
+				tprints("json output fatal error!\n");
+				return;
+			}
 	}
-	return 0;
+	
+	rewind(mock_file);
+	fflush(mock_file);
+	return;
 }
-
+void output_disable_redirect()
+{
+	if (jformat == FORMAT_ORIG)
+		return;
+	
+	redirect_output_flag = 0;
+	rewind(mock_file);
+	fflush(mock_file);
+	// we never fclose(mock_file), so we do net need free(mock_buf)
+	// free(mock_buf);
+	return;
+}
+void output_begin_meta()
+{
+	if (jformat == FORMAT_ORIG)
+		return;
+	
+	// clean all current buffer
+	// prepare for the next output
+	rewind(mock_file);
+	fflush(mock_file);
+	redirect_output_flag = 1;
+	return;
+}
 /*
  * high-level function prepare the meta-data 
  * and then call this entry function to do the print-staff
@@ -170,18 +160,16 @@ int output_orig(output_event_t event, const char *str, long extra)
  * (a string representing the meta-data)
  * 
  */
-int output_trace(output_event_t event, const char *str, long extra)
+int output_event(output_event_t event, long extra)
 {
-	switch( jformat ) {
-		case FORMAT_JSON:
-			return output_json(event, str, extra);
-			break;
-
-		case FORMAT_ORIG:
-			/* fall through to default output format */
-		default:
-			return output_orig(event, str, extra);
-			break;
-	}
+	if (jformat == FORMAT_ORIG)
+		return 0;
+	
+	fflush(mock_file);
+	redirect_output_flag = 0;
+	
+	output_json(event, mock_buf, extra);
+	rewind(mock_file);
+	
 	return 0;
 }

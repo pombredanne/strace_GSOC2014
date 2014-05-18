@@ -34,46 +34,36 @@
 # include <sys/uio.h>
 #endif
 
-#include <stdio.h>
 
 int
 sys_read(struct tcb *tcp)
 {
+	output_enable_redirect();
+	
 	if (entering(tcp)) {
-		if (jformat == FORMAT_ORIG) {
-			printfd(tcp, tcp->u_arg[0]);
-			tprints(", ");
-		} else {
-			char* ftemp = NULL;
-			size_t fsize = 0;
-			FILE* mock_file = open_memstream(&ftemp, &fsize);
-			if (mock_file == NULL) {
-				tprints("json unhandeable error fatal\n");
-				return 0;
-			}
-			
-			FILE* oldfile = tcp->outf;
-			int oldcol = tcp->curcol;
-			
-			tcp->outf = mock_file;
-			
-			printfd(tcp, tcp->u_arg[0]);
-			tprints(", ");
-			
-			fclose(mock_file);
-			tcp->outf = oldfile;
-			tcp->curcol = oldcol;
-			tprintf("json output is %s", ftemp);
-			
-			free(ftemp);
-		}
+		output_begin_meta();
+		printfd(tcp, tcp->u_arg[0]);
+		output_event(EVENT_CALL_ARG, 0);
+		
 	} else {
-		if (syserror(tcp))
+		if (syserror(tcp)) {
+			output_begin_meta();
 			tprintf("%#lx", tcp->u_arg[1]);
-		else
+			output_event(EVENT_CALL_RET_DESC, -1);
+		}
+		else {
+			output_begin_meta();
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu", tcp->u_arg[2]);
+			output_event(EVENT_CALL_ARG, 1);
+		}
+		tprints(", ");
+
+		output_begin_meta();
+		tprintf("%lu", tcp->u_arg[2]);
+		output_event(EVENT_CALL_RET_CODE, -1);
 	}
+	
+	output_disable_redirect();
 	return 0;
 }
 
